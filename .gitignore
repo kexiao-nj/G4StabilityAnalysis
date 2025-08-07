@@ -1,3 +1,5 @@
 *.*
 # !tools/*
 !prepared_datasets/*
+!.here
+!output-fig/
