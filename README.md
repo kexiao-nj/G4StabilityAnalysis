@@ -19,7 +19,7 @@ RScript analysis/fig2-a-corr.R
 ``` 
 For the distribution of Stability, eG4Sig, ATACSig, phyloP score, and TF number across the Chromatin states:
 ```shell
-RScript analysis/fig2-a-distr-acrs-chrmstate.R
+RScript analysis/fig2-bcd-distr-acrs-chrmstate.R
 ``` 
 OR you can run the R scripts line by line.
 
@@ -34,12 +34,24 @@ RScript analysis/fig3-0-causal-test.R
 #### 3.2.2 Robustness Measurement
 * Plot coverage against accuracy:
 ```shell
-RScript analysis/fig3-0-causal-robust-measure.R
+RScript analysis/fig3-a-causal-robust-measure.R
 ```
 #### 3.2.3 Drawing the most robust network
-* Plot coverage against accuracy:
 ```shell
-RScript analysis/fig3-0-causal-network-drawing.R
+RScript analysis/fig3-b-causal-network-drawing.R
 ```
 
+
+### 3.2 Causal Bayesian network Construction 2
+For Stability, phyloP score, ChromState, ATACSig and Occupancy of specific TFs
+#### 3.2.1 Construnction of causal Bayesian networks for different TFs
+* The sampling strategy and size for the most robust network were employed, based on the test of the last step. This may take a long time for the construction of these networks.
+* **OR you can skip this step and use the pre-generated networks in the `tfrobustnet` folder**:
+```shell
+RScript analysis/fig4-a-causal-network-constuct-tf-specific.R
+```
+#### 3.2.2 Drawing the networks
+```shell
+RScript analysis/fig4-a-causal-network-drawing-tf-specific.R
+```
 
