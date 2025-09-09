@@ -43,7 +43,7 @@ Rscript analysis/fig3-b-causal-network-drawing.R
 
 
 ### 3.3 Causal Bayesian network Construction 2
-For Stability, phyloP score, ChromState, ATACSig and Occupancy of specific TFs
+For Stability, eG4Sig, phyloP score, ChromState, ATACSig and Occupancy of specific TFs
 #### 3.3.1 Construnction of causal Bayesian networks for different TFs
 * The sampling strategy and size for the most robust network were employed, based on the test of the last step. This may take a long time for the construction of these networks.
 * **OR you can skip this step and use the pre-generated networks in the `tfrobustnet` folder**:

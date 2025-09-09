@@ -4,6 +4,8 @@ library(igraph)
 library(ggraph)
 library(tidygraph)
 library(showtext)
+showtext_auto()
+library(Matrix)
 setwd(here::here("analysis"))
 
 discrt_columns_by_median <- function(in_df, cols) {
@@ -109,12 +111,12 @@ g2 <- ggraph(bn_igraph, layout = "nicely") +
   )
 g2
 netobj <- paste('network', sla_fun, test_fun, M, N, step, suffix, 'pdf', sep='.')
-ggsave(here::here("../output-fig/fig3-b-most-robust-network.pdf"), g2,
+ggsave(here::here("output-fig/fig3-b-most-robust-network.pdf"), g2,
   width = 8, height = 6, device = cairo_pdf)
 
 
 Matr <- as_adjacency_matrix(bn_igraph, attr='dirct')
-write.table(as.matrix(Matr), file='../output-fig/table.robust.net.csv', sep=",", quote = FALSE)
+write.table(as.matrix(Matr), file=here::here("output-fig/table.robust.net.csv"), sep=",", quote = FALSE)
 
 
 # # for all the equal-allocation network

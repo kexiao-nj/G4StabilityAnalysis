@@ -4,6 +4,8 @@ library(igraph)
 library(ggraph)
 library(tidygraph)
 library(showtext)
+showtext_auto()
+library(Matrix)
 setwd(here::here("analysis"))
 
 bn2igraph <- function(bn, bn_str) {

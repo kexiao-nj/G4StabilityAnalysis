@@ -4,6 +4,7 @@ library(igraph)
 library(ggraph)
 library(tidygraph)
 library(showtext)
+library(Matrix)
 setwd(here::here("analysis"))
 
 discrt_columns_by_median <- function(in_df, cols) {
