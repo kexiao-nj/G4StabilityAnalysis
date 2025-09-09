@@ -44,7 +44,7 @@ calc_acc_covr <- function(sla_fun='pc.stable', test_fun='mc-x2', step=100, suffi
 # calc_acc_covr(sla_fun='pc.stable', test_fun='mc-x2', step=100, suffix='bs1-9', tardir='robusttest', N=10)
 sla_fun <- "pc.stable"
 test_fun <- "mc-x2"
-step <- 100
+step <- 50
 suffix <- 'bs1-9'
 tardir <- 'robusttest'
 
@@ -65,7 +65,7 @@ for (size in seq(1000,7000,1000)){
 calc_mean_std <- function(sla_fun='pc.stable', test_fun='mc-x2', step=100, suffix='bs1-9', tardir='robusttest', N=10){
   final_df <- data.frame()
   tardir2 <- paste('..', tardir, sep='/')
-  for(M in seq(0.1,0.6,0.1)){
+  for(M in seq(0.1,0.5,0.1)){
     tmp_df <- data.frame()
     netobj <- paste('acc', sla_fun, test_fun, M, N, step, suffix, 'Rds', sep='.')
     acc_df <- readRDS(paste(tardir2, netobj, sep='/'))
@@ -109,12 +109,14 @@ calc_mean_std <- function(sla_fun='pc.stable', test_fun='mc-x2', step=100, suffi
 mean_std_df <- calc_mean_std(sla_fun='pc.stable', test_fun='mc-x2', step=100, suffix='bs1-9', tardir='robusttest', N=10)
 
 
-g1 <- ggplot(mean_std_df[is.element(mean_std_df$Model, c('Proportion:0.5', 'Proportion:0.6', 'Size:6000', 'Size:7000')), ], 
+g1 <- ggplot(mean_std_df[is.element(mean_std_df$Model, c('Proportion:0.4', 'Proportion:0.5', 'Size:6000', 'Size:7000')), ], 
       aes(color=Model, x=cov, y=acc)) +
   geom_line(size = 1.2) + 
   geom_point(size = 3) + 
   geom_errorbar(aes(ymin = acc-accstd, ymax = acc+accstd), width=0.01, size=0.1) +
   geom_errorbar(aes(xmin = cov-covstd, xmax = cov+covstd), width=0.01, size=0.1) +
+  scale_x_continuous(limits = c(0.5,1)) +
+  scale_y_continuous(limits = c(0.5,1)) +
   labs(x = "Coverage",
        y = "Accuracy",
        color = "") +
@@ -127,6 +129,8 @@ g2 <- ggplot(mean_std_df[grepl('Proportion', mean_std_df$Model), ],
       aes(color=Model, x=cov, y=acc)) +
   geom_errorbar(aes(ymin = acc-accstd, ymax = acc+accstd), width=0.01, size=0.1) +
   geom_errorbar(aes(xmin = cov-covstd, xmax = cov+covstd), width=0.01, size=0.1) +
+  scale_x_continuous(limits = c(0.5,1)) +
+  scale_y_continuous(limits = c(0.5,1)) +
   geom_line(size = 1.2) + 
   geom_point(size = 3) + 
   labs(x = "Coverage",
@@ -140,6 +144,8 @@ g3 <- ggplot(mean_std_df[grepl('Size', mean_std_df$Model), ],
       aes(color=Model, x=cov, y=acc)) +
   geom_errorbar(aes(ymin = acc-accstd, ymax = acc+accstd), width=0.01, size=0.1) +
   geom_errorbar(aes(xmin = cov-covstd, xmax = cov+covstd), width=0.01, size=0.1) +
+  scale_x_continuous(limits = c(0.5,1)) +
+  scale_y_continuous(limits = c(0.5,1)) +
   geom_line(size = 1.2) + 
   geom_point(size = 3) + 
   labs(x = "Coverage",

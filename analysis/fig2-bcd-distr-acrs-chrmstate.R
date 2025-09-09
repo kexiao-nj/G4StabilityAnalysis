@@ -88,7 +88,7 @@ g_Stability<-ggplot(final_df[final_df$Type == celltype,], aes(Stability, ChromSt
   geom_jitter(alpha=0.5, size=0.2, color='gray') +
   geom_boxplot(aes(color=ChromState, fill = ChromState), outlier.size = 0.1,
                lwd=0.3, alpha=0.5) +
-  scale_x_continuous(expand = expansion(mult = c(0, -0.6))) +
+  scale_x_continuous(expand = expansion(mult = c(0, -0.2))) +
   scale_y_discrete(drop = FALSE) +
   xlab('Stability Level (MM %)') +
   theme_bw() +
@@ -217,7 +217,7 @@ g_Stability<-ggplot(final_df[final_df$Type == celltype,], aes(Stability, ChromSt
   geom_jitter(alpha=0.5, size=0.2, color='gray') +
   geom_boxplot(aes(color=ChromState, fill = ChromState), outlier.size = 0.1,
                lwd=0.3, alpha=0.5) +
-  scale_x_continuous(expand = expansion(mult = c(0, -0.6))) +
+  scale_x_continuous(expand = expansion(mult = c(0, -0.2))) +
   scale_y_discrete(drop = FALSE) +
   xlab('Stability Level (MM %)') +
   theme_bw() +
@@ -346,7 +346,7 @@ g_Stability<-ggplot(final_df[final_df$Type == celltype,], aes(Stability, ChromSt
   geom_jitter(alpha=0.5, size=0.2, color='gray') +
   geom_boxplot(aes(color=ChromState, fill = ChromState), outlier.size = 0.1,
                lwd=0.3, alpha=0.5) +
-  scale_x_continuous(expand = expansion(mult = c(0, -0.6))) +
+  scale_x_continuous(expand = expansion(mult = c(0, -0.2))) +
   scale_y_discrete(drop = FALSE) +
   xlab('Stability Level (MM %)') +
   theme_bw() +

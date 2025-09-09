@@ -42,13 +42,23 @@ gen_datalist <- function(datalist, namelist) {
 
 common_tf <- c('SP2', 'SP1', 'YY1', 'CTCF', 'FOXA1', 'TARDBP')
 # read prepared datasets
-vars <- c('Stability', 'ATACSig', 'phyloP')
+
+vars <- c('ATACSig', 'phyloP')
 target_vals <- c('Stability.strength', 'phyloP.strength', 'ATACSig.strength', 'ChromState')
-renamed_vals <- c('Stability', 'phyloP', 'ATACSig', 'ChromState')
+renamed_vals <- c('Stability', 'phyloP', 'ATACSig',  'ChromState')
+
+in_df1 <- data.frame(read.csv('../prepared_datasets/K562.tsv', sep = "\t"))
+in_df2 <- data.frame(read.csv('../prepared_datasets/HepG2.tsv', sep = "\t"))
+in_df3 <- data.frame(read.csv('../prepared_datasets/293T.tsv', sep = "\t"))
+# med <- median(c(in_df1$Stability, in_df2$Stability, in_df3$Stability))
+med <- 25
 
 ## K562
-in_df1 <- data.frame(read.csv('../prepared_datasets/K562.tsv', sep = "\t"))
 in_df1 <- discrt_columns_by_median(in_df1, vars)
+in_df1$Stability.strength <- 'High'
+in_df1[in_df1$Stability < med, 'Stability.strength'] <- 'Low'
+in_df1[, 'Stability.strength'] <- factor(in_df1[, 'Stability.strength'], levels = c('Low','High'))
+
 data1 <- in_df1[,target_vals]
 data1$ChromState <- factor(data1$ChromState, levels = c("1_TssA","2_TssFlnk","3_TssFlnkU","4_TssFlnkD","5_Tx","6_TxWk", "7_EnhG1","8_EnhG2","9_EnhA1","10_EnhA2","11_EnhWk","12_ZNF/Rpts", "13_Het","14_TssBiv","15_EnhBiv","16_ReprPC","17_ReprPCWk","18_Quies"))
 names(data1) <- renamed_vals
@@ -58,8 +68,11 @@ factor_data1 <- lapply(in_df1[,common_tf], function(col){
 data1 <- cbind(data1,as.data.frame(factor_data1))
 
 ## HepG2
-in_df2 <- data.frame(read.csv('../prepared_datasets/HepG2.tsv', sep = "\t"))
 in_df2 <- discrt_columns_by_median(in_df2, vars)
+in_df2$Stability.strength <- 'High'
+in_df2[in_df2$Stability < med, 'Stability.strength'] <- 'Low'
+in_df2[, 'Stability.strength'] <- factor(in_df2[, 'Stability.strength'], levels = c('Low','High'))
+
 data2 <- in_df2[,target_vals]
 data2$ChromState <- factor(data2$ChromState, levels = c("1_TssA","2_TssFlnk","3_TssFlnkU","4_TssFlnkD","5_Tx","6_TxWk", "7_EnhG1","8_EnhG2","9_EnhA1","10_EnhA2","11_EnhWk","12_ZNF/Rpts", "13_Het","14_TssBiv","15_EnhBiv","16_ReprPC","17_ReprPCWk","18_Quies"))
 names(data2) <- renamed_vals
@@ -69,8 +82,11 @@ factor_data2 <- lapply(in_df2[,common_tf], function(col){
 data2 <- cbind(data2,as.data.frame(factor_data2))
 
 ## 293T
-in_df3 <- data.frame(read.csv('../prepared_datasets/293T.tsv', sep = "\t"))
 in_df3 <- discrt_columns_by_median(in_df3, vars)
+in_df3$Stability.strength <- 'High'
+in_df3[in_df3$Stability < med, 'Stability.strength'] <- 'Low'
+in_df3[, 'Stability.strength'] <- factor(in_df3[, 'Stability.strength'], levels = c('Low','High'))
+
 data3 <- in_df3[,target_vals]
 data3$ChromState <- factor(data3$ChromState, levels = c("1_TssA","2_TssFlnk","3_TssFlnkU","4_TssFlnkD","5_Tx","6_TxWk", "7_EnhG1","8_EnhG2","9_EnhA1","10_EnhA2","11_EnhWk","12_ZNF/Rpts", "13_Het","14_TssBiv","15_EnhBiv","16_ReprPC","17_ReprPCWk","18_Quies"))
 names(data3) <- renamed_vals
@@ -134,12 +150,12 @@ one_bootstrap_experiment <- function(data_list, gen_method = 'gen_Ngroup_selfada
 multi_bootstrap_experiment <- function(data_list, gen_method='gen_Ngroup_selfadaptingSize_combination', sla_fun='pc.stable', test_fun='x2', step=10, suffix='bs1-9', tardir='robusttest', M=0.9, N=10) {
   matrix_list <- vector(step, mode = "list")
   netlist_list <- vector(step, mode = "list")
-  # for(i in 1:step){
-  #   tmplist <- one_bootstrap_experiment(data_list, gen_method, sla_fun, test_fun, M, N)
-  #   netlist_list[[i]] <- tmplist[[1]]
-  #   matrix_list[[i]] <- tmplist[[2]]
-  #   print(matrix_list[[i]])
-  # }
+  for(i in 1:step){
+    tmplist <- one_bootstrap_experiment(data_list, gen_method, sla_fun, test_fun, M, N)
+    netlist_list[[i]] <- tmplist[[1]]
+    matrix_list[[i]] <- tmplist[[2]]
+    print(matrix_list[[i]])
+  }
   
   tardir2 <- paste('..', tardir, sep='/')
   if (!dir.exists(tardir2)) {
@@ -159,7 +175,7 @@ multi_bootstrap_experiment <- function(data_list, gen_method='gen_Ngroup_selfada
 # Now test different strategies
 sla_fun <- 'pc.stable'
 test_fun <- 'mc-x2'
-step <- 100
+step <- 50
 tardir <- 'tfrobustnet'
 
 common_tf <- c('SP2', 'SP1', 'YY1', 'CTCF', 'FOXA1', 'TARDBP')

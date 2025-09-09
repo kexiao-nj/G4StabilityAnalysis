@@ -19,27 +19,42 @@ discrt_columns_by_median <- function(in_df, cols) {
 }
 
 # read prepared datasets
-vars <- c('eG4Sig', 'Stability', 'ATACSig', 'phyloP', 'TFnum')
-target_vals <- c('eG4Sig.strength', 'Stability.strength', 'phyloP.strength', 'ATACSig.strength', 'ChromState', 'TFnum.strength')
-renamed_vals <- c('eG4Sig', 'Stability', 'phyloP', 'ATACSig', 'ChromState', 'TFNo')
+vars <- c('eG4Sig', 'ATACSig', 'phyloP', 'TFnum')
+target_vals <- c('Stability.strength', 'eG4Sig.strength', 'phyloP.strength', 'ATACSig.strength', 'ChromState', 'TFnum.strength')
+renamed_vals <- c('Stability', 'eG4Sig', 'phyloP', 'ATACSig', 'ChromState', 'TFNo')
+
+in_df1 <- data.frame(read.csv('../prepared_datasets/K562.tsv', sep = "\t"))
+in_df2 <- data.frame(read.csv('../prepared_datasets/HepG2.tsv', sep = "\t"))
+in_df3 <- data.frame(read.csv('../prepared_datasets/293T.tsv', sep = "\t"))
+# med <- median(c(in_df1$Stability, in_df2$Stability, in_df3$Stability))
+med <- 25
 
 ## K562
-in_df1 <- data.frame(read.csv('../prepared_datasets/K562.tsv', sep = "\t"))
 in_df1 <- discrt_columns_by_median(in_df1, vars)
+in_df1$Stability.strength <- 'High'
+in_df1[in_df1$Stability < med, 'Stability.strength'] <- 'Low'
+in_df1[, 'Stability.strength'] <- factor(in_df1[, 'Stability.strength'], levels = c('Low','High'))
+
 data1 <- in_df1[,target_vals]
 data1$ChromState <- factor(data1$ChromState, levels = c("1_TssA","2_TssFlnk","3_TssFlnkU","4_TssFlnkD","5_Tx","6_TxWk", "7_EnhG1","8_EnhG2","9_EnhA1","10_EnhA2","11_EnhWk","12_ZNF/Rpts", "13_Het","14_TssBiv","15_EnhBiv","16_ReprPC","17_ReprPCWk","18_Quies"))
 names(data1) <- renamed_vals
 
 ## HepG2
-in_df2 <- data.frame(read.csv('../prepared_datasets/HepG2.tsv', sep = "\t"))
 in_df2 <- discrt_columns_by_median(in_df2, vars)
+in_df2$Stability.strength <- 'High'
+in_df2[in_df2$Stability < med, 'Stability.strength'] <- 'Low'
+in_df2[, 'Stability.strength'] <- factor(in_df2[, 'Stability.strength'], levels = c('Low','High'))
+
 data2 <- in_df2[,target_vals]
 data2$ChromState <- factor(data2$ChromState, levels = c("1_TssA","2_TssFlnk","3_TssFlnkU","4_TssFlnkD","5_Tx","6_TxWk", "7_EnhG1","8_EnhG2","9_EnhA1","10_EnhA2","11_EnhWk","12_ZNF/Rpts", "13_Het","14_TssBiv","15_EnhBiv","16_ReprPC","17_ReprPCWk","18_Quies"))
 names(data2) <- renamed_vals
 
 ## 293T
-in_df3 <- data.frame(read.csv('../prepared_datasets/293T.tsv', sep = "\t"))
 in_df3 <- discrt_columns_by_median(in_df3, vars)
+in_df3$Stability.strength <- 'High'
+in_df3[in_df3$Stability < med, 'Stability.strength'] <- 'Low'
+in_df3[, 'Stability.strength'] <- factor(in_df3[, 'Stability.strength'], levels = c('Low','High'))
+
 data3 <- in_df3[,target_vals]
 data3$ChromState <- factor(data3$ChromState, levels = c("1_TssA","2_TssFlnk","3_TssFlnkU","4_TssFlnkD","5_Tx","6_TxWk", "7_EnhG1","8_EnhG2","9_EnhA1","10_EnhA2","11_EnhWk","12_ZNF/Rpts", "13_Het","14_TssBiv","15_EnhBiv","16_ReprPC","17_ReprPCWk","18_Quies"))
 names(data3) <- renamed_vals
@@ -148,7 +163,7 @@ multi_bootstrap_experiment <- function(data_list, gen_method='gen_Ngroup_selfada
 # Now test different strategies, it might take a long time. So I suggest for result demonstration, you can just use the data generated prevously in the robusttest folder to save time
 sla_fun <- 'pc.stable'
 test_fun <- 'mc-x2'
-step <- 100
+step <- 50
 suffix <- 'bs1-9'
 tardir <- 'robusttest'
 

@@ -63,10 +63,12 @@ data_list <- list(data1, data2, data3)
 # for the robust network
 sla_fun <- 'pc.stable'
 test_fun <- 'mc-x2'
-step <- 100
+# step <- 100
+step <- 50
 suffix <- 'bs1-9'
 tardir <- 'robusttest'
 M <- 7000
+# M <- 0.6
 N <- 10
 
 netobj <- paste('matrix', sla_fun, test_fun, M, N, step, suffix, 'Rds', sep='.')
@@ -74,7 +76,7 @@ matrix_list <- readRDS(paste('..', tardir, netobj, sep='/'))
 matrix_list_filtered <- vector(step, mode = "list")
 for (i in seq_along(matrix_list)){
   mat <- matrix_list[[i]]
-  mat[mat <= 6] <- 0
+  mat[mat <= 5] <- 0
   mat[mat > 0] <- 1
   matrix_list_filtered[[i]] <- mat
 }
@@ -88,7 +90,7 @@ for (i in seq_along(matrix_list_filtered)){
 
 
 str.net <- custom.strength(network_list_filtered, names(data1))
-avg.dag <- averaged.network(str.net, threshold = 0.9)
+avg.dag <- averaged.network(str.net, threshold = 1)
 bn_igraph <- bn2igraph(avg.dag, str.net)
 g2 <- ggraph(bn_igraph, layout = "nicely") +
   geom_edge_fan(aes(color = dirct, label = round(dirct,2)), 
@@ -107,79 +109,84 @@ g2 <- ggraph(bn_igraph, layout = "nicely") +
   )
 g2
 netobj <- paste('network', sla_fun, test_fun, M, N, step, suffix, 'pdf', sep='.')
-ggsave(here::here("output-fig/fig3-b-most-robust-network.pdf"), g2,
+ggsave(here::here("../output-fig/fig3-b-most-robust-network.pdf"), g2,
   width = 8, height = 6, device = cairo_pdf)
 
 
+Matr <- as_adjacency_matrix(bn_igraph, attr='dirct')
+write.table(as.matrix(Matr), file='../output-fig/table.robust.net.csv', sep=",", quote = FALSE)
 
-# for all the equal-allocation network
-draw_all_equal_alloc <- function(sla_fun, test_fun, M_vec, N, step, suffix, tardir, keywords='all_equal_alloc') {
-  tgraph_list <- vector(length(M_vec), mode = "list")
-  j <- 1
-  if (keywords=='all_equal_alloc'){
-    labl <- 'Equal-allocation:'
-  }
-  else {
-    labl <- 'Proportional-allocation:'
-  }
+
+# # for all the equal-allocation network
+# draw_all_equal_alloc <- function(sla_fun, test_fun, M_vec, N, step, suffix, tardir, keywords='all_equal_alloc') {
+#   tgraph_list <- vector(length(M_vec), mode = "list")
+#   j <- 1
+#   if (keywords=='all_equal_alloc'){
+#     labl <- 'Equal-allocation:'
+#   }
+#   else {
+#     labl <- 'Proportional-allocation:'
+#   }
   
-  for (M in M_vec){
-    netobj <- paste('matrix', sla_fun, test_fun, M, N, step, suffix, 'Rds', sep='.')
-    matrix_list <- readRDS(paste('..', tardir, netobj, sep='/'))
-    matrix_list_filtered <- vector(step, mode = "list")
+#   for (M in M_vec){
+#     netobj <- paste('matrix', sla_fun, test_fun, M, N, step, suffix, 'Rds', sep='.')
+#     matrix_list <- readRDS(paste('..', tardir, netobj, sep='/'))
+#     matrix_list_filtered <- vector(step, mode = "list")
 
-    for (i in seq_along(matrix_list)){
-      mat <- matrix_list[[i]]
-      mat[mat <= 6] <- 0
-      mat[mat > 0] <- 1
-      matrix_list_filtered[[i]] <- mat
-    }
+#     for (i in seq_along(matrix_list)){
+#       mat <- matrix_list[[i]]
+#       mat[mat <= 5] <- 0
+#       mat[mat > 0] <- 1
+#       matrix_list_filtered[[i]] <- mat
+#     }
 
-    graph_from_adjacency_matrix(matrix_list_filtered[[1]], mode = "directed")
-    as.bn(graph_from_adjacency_matrix(matrix_list_filtered[[1]], mode = "directed"))
+#     graph_from_adjacency_matrix(matrix_list_filtered[[1]], mode = "directed")
+#     as.bn(graph_from_adjacency_matrix(matrix_list_filtered[[1]], mode = "directed"))
 
-    network_list_filtered <- vector(step, mode = "list")
-    for (i in seq_along(matrix_list_filtered)){
-      network_list_filtered[[i]] <- as.bn(graph_from_adjacency_matrix(matrix_list_filtered[[i]], mode = "directed"))
-    }
-    str.net <- custom.strength(network_list_filtered, names(data1))
-    avg.dag <- averaged.network(str.net, threshold = 0.9)
-    bn_igraph <- bn2igraph(avg.dag, str.net)
-    igr <- bn_igraph %>% set_vertex_attr("type", value = paste(labl, M))
-    tgraph_list[[j]] <- as_tbl_graph(igr)
-    j <- j + 1
-  }
-  tg_list <- do.call(bind_graphs, tgraph_list) %>%
-    mutate(type = factor(type, levels = paste(labl, M_vec)))
+#     network_list_filtered <- vector(step, mode = "list")
+#     for (i in seq_along(matrix_list_filtered)){
+#       network_list_filtered[[i]] <- as.bn(graph_from_adjacency_matrix(matrix_list_filtered[[i]], mode = "directed"), check.cycles = FALSE)
+#     }
+#     str.net <- custom.strength(network_list_filtered, names(data1))
+#     avg.dag <- averaged.network(str.net, threshold = 1)
+#     bn_igraph <- bn2igraph(avg.dag, str.net)
+#     igr <- bn_igraph %>% set_vertex_attr("type", value = paste(labl, M))
+#     tgraph_list[[j]] <- as_tbl_graph(igr)
+#     j <- j + 1
+#   }
+#   tg_list <- do.call(bind_graphs, tgraph_list) %>%
+#     mutate(type = factor(type, levels = paste(labl, M_vec)))
 
-  g_all <-ggraph(tg_list, layout = "nicely") +
-    geom_edge_fan(aes(color = strength, label = round(dirct,2)), 
-      width = 3, label_size = 6, 
-      arrow = arrow(length = unit(4, "mm")), end_cap = circle(8, unit="mm")
-    ) +
-    geom_node_point(size=10,shape=21,fill='cadetblue1',color='cadetblue1')+ 
-    geom_node_text(aes(label = name), repel = TRUE, size = 5, fontface = "bold") +
-    scale_edge_color_gradient(low = "#FFEDA0", high = "#F03B20", name = "Direction Prob", limits = c(0, 1) ) +
-    # guides(edge_width = "none", edge_alpha = "none" ) +
-    theme_graph(base_family = "DejaVu Sans", background = "white") + 
-    theme(strip.background = element_rect(fill = "grey90"), strip.text = element_text(face = "bold", size = 12))+
-    facet_nodes(~type, scales = "free", ncol = 3)
+#   g_all <-ggraph(tg_list, layout = "nicely") +
+#     geom_edge_fan(aes(label = round(dirct,2)), 
+#       color = 'gray70',
+#       width = 3, label_size = 6, 
+#       arrow = arrow(length = unit(4, "mm")), end_cap = circle(8, unit="mm")
+#     ) +
+#     geom_node_point(size=10,shape=21,fill='cadetblue1',color='cadetblue1')+ 
+#     geom_node_text(aes(label = name), repel = TRUE, size = 5, fontface = "bold") +
+#     scale_edge_color_gradient(low = "#FFEDA0", high = "#F03B20", name = "Direction Prob", limits = c(0, 1) ) +
+#     # guides(edge_width = "none", edge_alpha = "none" ) +
+#     theme_graph(base_family = "DejaVu Sans", background = "white") + 
+#     theme(strip.background = element_rect(fill = "grey90"), strip.text = element_text(face = "bold", size = 12))+
+#     facet_nodes(~type, scales = "free", ncol = 3)
 
-  g_all
-  netobj <- paste('network', sla_fun, test_fun, keywords, N, step, suffix, 'pdf', sep='.')
-  ggsave(here::here(paste("output-fig/figs5-",netobj,sep='')), g_all,
-    width = 20, height = 6, device = cairo_pdf)
-}
+#   g_all
+#   netobj <- paste('network', sla_fun, test_fun, keywords, N, step, suffix, 'pdf', sep='.')
+#   ggsave(here::here(paste("../output-fig/figs5-",netobj,sep='')), g_all,
+#     width = 20, height = 6, device = cairo_pdf)
+# }
 
-sla_fun <- 'pc.stable'
-test_fun <- 'mc-x2'
-step <- 100
-suffix <- 'bs1-9'
-tardir <- 'robusttest'
-N <- 10
+# sla_fun <- 'pc.stable'
+# test_fun <- 'mc-x2'
+# # step <- 100
+# step <- 50
+# suffix <- 'bs1-9'
+# tardir <- 'robusttest'
+# N <- 10
 
-M_vec <- c(4000, 5000, 6000)
-draw_all_equal_alloc(sla_fun, test_fun, M_vec, N, step, suffix, tardir, keywords='all_equal_alloc')
+# M_vec <- c(4000, 5000, 6000)
+# draw_all_equal_alloc(sla_fun, test_fun, M_vec, N, step, suffix, tardir, keywords='all_equal_alloc')
 
-M_vec <- c(0.4, 0.5, 0.6)
-draw_all_equal_alloc(sla_fun, test_fun, M_vec, N, step, suffix, tardir, keywords='all_prop_alloc')
+# M_vec <- c(0.3, 0.4, 0.5)
+# draw_all_equal_alloc(sla_fun, test_fun, M_vec, N, step, suffix, tardir, keywords='all_prop_alloc')

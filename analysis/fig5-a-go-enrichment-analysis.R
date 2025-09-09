@@ -1,3 +1,4 @@
+.libPaths("~/miniconda3/lib/R/library")
 library(ggplot2)
 library(cowplot)
 library(ggsci)
@@ -11,26 +12,22 @@ setwd(here::here("analysis"))
 # read prepared datasets
 cols <- c("index", "chrom", "start", "end", "pqs.position", "eG4Sig", "Stability", "Type", "annotation", "geneId", "transcriptId", "distanceToTSS")
 in_df <- data.frame(read.csv('../prepared_datasets/K562.tsv', sep = "\t"))
-in_df <- in_df[,cols]
-in_df$mmpctlvl <- 'Low'
-in_df[in_df$Stability > median(in_df$Stability), 'mmpctlvl'] <- 'High'
-in_df$mmpctlvl <- factor(in_df$mmpctlvl, levels = c('Low', 'High'))
-final_df <- in_df[,c(cols, 'mmpctlvl')]
+
+final_df <- in_df[,cols]
 
 in_df <- data.frame(read.csv('../prepared_datasets/HepG2.tsv', sep = "\t"))
-in_df$mmpctlvl <- 'Low'
-in_df[in_df$Stability > median(in_df$Stability), 'mmpctlvl'] <- 'High'
-in_df$mmpctlvl <- factor(in_df$mmpctlvl, levels = c('Low', 'High'))
-final_df <- rbind(final_df, in_df[,c(cols, 'mmpctlvl')])
+
+final_df <- rbind(final_df, in_df[,cols])
 
 in_df <- data.frame(read.csv('../prepared_datasets/293T.tsv', sep = "\t"))
-in_df$mmpctlvl <- 'Low'
-in_df[in_df$Stability > median(in_df$Stability), 'mmpctlvl'] <- 'High'
-in_df$mmpctlvl <- factor(in_df$mmpctlvl, levels = c('Low', 'High'))
-final_df <- rbind(final_df, in_df[,c(cols, 'mmpctlvl')])
+
+final_df <- rbind(final_df, in_df[,cols])
 
 final_df$Type <- factor(final_df$Type, levels =c("K562", "HepG2", "293T"))
 
+final_df$mmpctlvl <- 'Low'
+final_df[final_df$Stability > 25, 'mmpctlvl'] <- 'High'
+final_df$mmpctlvl <- factor(final_df$mmpctlvl, levels = c('Low', 'High'))
 
 
 high_vec_K562_vinc <- final_df[(final_df$distanceToTSS > -200) & (final_df$distanceToTSS < 200) & final_df$Type=='K562' & final_df$mmpctlvl=='High', 'geneId']
@@ -50,7 +47,7 @@ names(geneClsts)<-c('K562 Low', 'HepG2 Low', '293T Low',
 
 cmpClstGO <- compareCluster(geneClusters = geneClsts, fun = enrichGO,
                             ont = "BP",OrgDb='org.Hs.eg.db')
-p1 <- dotplot(cmpClstGO, showCategory = 10, label_format=80, font.size=14) +
+p1 <- dotplot(cmpClstGO, showCategory = 20, label_format=80, font.size=14) +
   theme_bw() +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_text(angle = 15, vjust = 1),
@@ -58,6 +55,7 @@ p1 <- dotplot(cmpClstGO, showCategory = 10, label_format=80, font.size=14) +
   scale_color_material("red", reverse = TRUE)
 
 p1
-save_plot(here::here("output-fig/fig5-tss-vincity-GOenrich-4stability.pdf"), p1, base_height=12, base_asp=0.8)
+# save_plot(here::here("output-fig/fig5-tss-vincity-GOenrich-4stability-cutoff25.pdf"), p1, base_height=12, base_asp=0.8)
+save_plot(here::here("output-fig/fig5-tss-vincity-GOenrich-4stability-cutoff25-20.pdf"), p1, base_height=20, base_asp=0.5)
 
 

@@ -30,7 +30,7 @@ intens_df <- data.frame('x'=NA, 'y'=NA, 'cor'=NA, 'p'=NA, 'star'=NA, 'Type'=NA)
 p_to_star <- function(p) {
   cut(p,
       breaks = c(-Inf, 0.001, 0.01, 0.05, 1),
-      labels = c("***", "**", "*", ""))
+      labels = c("***", "**", "*", "."))
 }
 
 for (t in Types) {

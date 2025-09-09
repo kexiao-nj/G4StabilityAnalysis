@@ -1,8 +1,9 @@
 *.*
+*/*
 # !tools/*
 !prepared_datasets/*
 !.here
-!output-fig/
-!robusttest/*
-!tfrobustnet/*
+!output-fig/*
+!robusttest/*.*
+!tfrobustnet/*.*
 !analysis/*
